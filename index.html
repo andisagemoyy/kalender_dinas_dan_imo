@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1468d8">
+  <meta name="description" content="Kalender dinas Andisa, jadwal otomatis 6 hari kerja dan 2 hari libur, serta rekap foto IMO.">
+  <title>Dinesan Andisa — Kalender Dinas</title>
+  <link rel="manifest" href="manifest.webmanifest?v=20261006-kai">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Dinesan Andisa">
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=20261006-kai">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-kai-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-kai-32.png">
+  <link rel="icon" type="image/svg+xml" href="icons/favicon-kai.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-kai.png">
+  <link rel="stylesheet" href="style.css?v=20261006-kaiicons">
+  <script src="app.js?v=20261006-kaiicons" defer></script>
+  <script src="leave.js" defer></script>
+  <script src="zip.js" defer></script>
+  <script src="duty-schedule.js?v=20261006-kaiicons" defer></script>
+  <script src="duty-planner.js?v=20261006-kaiicons" defer></script>
+  <script src="monthly.js?v=20261006-kaiicons" defer></script>
+  <script src="daily-camera.js?v=20261006-kaiicons" defer></script>
+  <script src="duty-reminders.js?v=20261006-kaiicons" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="brand-icon" aria-hidden="true">◉</span><span>Dinesan<span class="brand-light"> Andisa</span><small>KALENDER DINAS PRIBADI</small></span></a>
+    <span class="header-label">STASIUN JAKARTA KOTA</span>
+  </header>
+  <nav class="mode-tabs" aria-label="Mode kerja"><button id="monthlyTab" class="mode-tab selected" type="button" aria-pressed="true">Kalender dinas</button><button id="cameraTab" class="mode-tab" type="button" aria-pressed="false">Kamera satu foto</button></nav>
+  <main id="monthlyWorkspace" class="monthly-workspace">
+    <div class="monthly-heading"><div><span class="eyebrow">DINESAN ANDISA</span><h1>Dinasmu, sudah terjadwal.</h1><p>6 hari kerja, 2 hari libur. Jadwal terhitung otomatis, foto bisa diisi sedikit demi sedikit.</p></div><label class="month-picker">Bulan kalender<input id="monthPicker" type="month" required></label></div>
+    <section class="duty-panel" aria-label="Kalender dan pengingat dinas">
+      <div class="duty-upcoming" aria-label="Dinas hari ini dan besok">
+        <article id="dutyToday" class="duty-reminder"><span class="eyebrow">HARI INI</span><strong></strong><small></small></article>
+        <article id="dutyTomorrow" class="duty-reminder"><span class="eyebrow">BESOK</span><strong></strong><small></small></article>
+      </div>
+      <p class="duty-anchor">Patokan: <b>6 Oktober 2026 = Malam ke-1</b>. Pola berulang ke depan dan ke belakang.</p>
+      <form id="dutySearchForm" class="duty-search">
+        <label for="dutySearchDate">Cari dinas pada tanggal<input id="dutySearchDate" type="date" min="1900-01-01" max="9999-12-31" required></label>
+        <button class="button primary" type="submit">Lihat tanggal</button>
+      </form>
+      <p id="dutySearchResult" class="duty-search-result" role="status" aria-live="polite"></p>
+      <div class="duty-calendar-toolbar"><button id="dutyPreviousMonth" class="button secondary" type="button" aria-label="Bulan sebelumnya">←</button><h2 id="dutyMonthTitle"></h2><button id="dutyNextMonth" class="button secondary" type="button" aria-label="Bulan berikutnya">→</button><button id="dutyGoToday" class="text-button" type="button">Hari ini</button></div>
+      <div class="duty-weekdays" aria-hidden="true"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span></div>
+      <div id="dutyCalendarGrid" class="duty-calendar-grid" aria-label="Jadwal dinas satu bulan"></div>
+      <p class="duty-calendar-help">Ketuk tanggal untuk melihat atau mengedit dinas. Tanda <b>+</b> berarti ada dinas tambahan; <b>*</b> berarti dinas utama diubah manual.</p>
+      <details class="reminder-settings"><summary>Pengingat &amp; notifikasi</summary><p>Pengingat otomatis 3 jam sebelum IJK, dalam WIB. Jam ini terpisah dari timestamp foto.</p><div class="reminder-time-grid"><label>IJK Pagi<input id="reminderTimePagi" type="time" value="07:00" readonly><small>Pengingat 04.00 WIB</small></label><label>IJK Siang<input id="reminderTimeSiang" type="time" value="15:00" readonly><small>Pengingat 12.00 WIB</small></label><label>IJK Malam<input id="reminderTimeMalam" type="time" value="22:00" readonly><small>Pengingat 19.00 WIB</small></label><label>Ingatkan sebelum<select id="reminderLead" disabled><option value="180" selected>3 jam sebelum IJK</option></select></label></div><div class="reminder-actions"><button id="saveReminderSettings" class="button secondary" type="button">Simpan pengingat</button><button id="enableDutyNotifications" class="button primary" type="button">Aktifkan notifikasi web</button><button id="testDutyNotification" class="text-button" type="button">Tes notifikasi</button><button id="exportDutyCalendar" class="button secondary" type="button">Unduh kalender HP (.ics)</button></div><p id="reminderStatus" role="status" aria-live="polite"></p><p class="note">Notifikasi web diperiksa saat halaman aktif. Untuk pengingat saat web ditutup, impor file .ics ke Kalender HP dan periksa alarmnya. File kalender memuat bulan yang sedang dilihat; perubahan berikutnya perlu diimpor kembali.</p></details>
+    </section>
+    <details id="dutyPhotoSection" class="photo-recap"><summary>Foto timestamp dan rekap bulanan</summary>
+    <div class="monthly-toolbar">
+      <div class="monthly-officer"><span class="eyebrow">PETUGAS</span><strong id="monthlyOfficerName">ANDISA JATI APRILIA ABADI</strong><span id="monthlyOfficerNipp">NIPP 76121</span><button class="text-button officer-open" type="button">Ganti / simpan petugas</button></div>
+      <div class="default-settings"><label class="field-label" for="defaultShift">Dinas untuk foto baru</label><select id="defaultShift"><option value="AUTO">OTOMATIS SESUAI TANGGAL</option><option value="PAGI">PAGI</option><option value="SIANG">SIANG</option><option value="MALAM">MALAM</option></select><button id="applyDefaultShift" class="text-button" type="button">Terapkan ke foto yang terisi</button></div>
+      <div class="upload-settings"><label class="check-label"><input id="defaultOldStamp" type="checkbox"> Foto baru sudah bertimestamp</label><label class="button primary" for="bulkPhotos">Unggah banyak foto</label><input id="bulkPhotos" type="file" accept="image/*" multiple hidden><small>Urutan nama file → tanggal kosong berurutan.</small></div>
+    </div>
+    <div class="monthly-summary"><div><strong id="monthSummary">0 foto</strong><span id="monthEmptySummary"></span><progress id="monthCompletion" value="0" max="31" aria-label="Kelengkapan rekap"></progress></div><div class="summary-actions"><span id="draftStatus" class="draft-status">Draf di perangkat ini</span><button id="exportMonth" class="button download" type="button" disabled>Unduh semua ZIP ↓</button></div></div>
+    <div id="exportProgress" class="export-progress" hidden><progress id="exportProgressBar" max="1" value="0"></progress><span id="exportProgressText"></span><button id="cancelExport" class="text-button" type="button">Batalkan</button></div>
+    <p id="monthMessage" class="message" role="status" aria-live="polite">Unggah banyak foto sekaligus, atau pilih foto pada tanggal tertentu.</p>
+    <div id="dayGrid" class="day-grid" aria-label="Foto per tanggal"></div>
+    </details>
+  </main>
+  <main id="cameraWorkspace" class="workspace" hidden>
+    <section class="camera-panel" aria-label="Kamera dan pratinjau foto">
+      <div class="panel-top"><span class="eyebrow">PRATINJAU FOTO</span><span id="cameraStatus" class="status">Kamera belum aktif</span></div>
+      <div id="cameraViewfinder" class="viewfinder">
+        <video id="video" playsinline muted autoplay hidden></video>
+        <canvas id="output" width="1200" height="1600" aria-label="Pratinjau foto dengan timestamp"></canvas>
+        <div id="emptyState" class="empty-state"><div class="camera-symbol" aria-hidden="true">▣</div><h1>Siap ambil foto?</h1><p>Aktifkan kamera, lalu ambil selfie.<br>Timestamp langsung masuk ke foto.</p><button id="startCamera" class="button primary" type="button">Aktifkan kamera</button></div>
+      </div>
+      <div class="camera-zoom-controls"><div class="zoom-heading"><label for="cameraZoom">Perbesar foto</label><output id="cameraZoomValue" for="cameraZoom">100%</output></div><div class="zoom-slider-row"><input id="cameraZoom" type="range" min="100" max="200" step="5" value="100" aria-valuetext="100 persen" disabled><button id="resetCameraZoom" class="text-button" type="button" disabled>Reset 100%</button></div></div>
+      <div class="camera-actions">
+        <button id="switchCamera" class="button icon-button" type="button" disabled aria-label="Ganti kamera depan atau belakang" title="Ganti kamera">↻</button>
+        <button id="capture" class="button primary capture" type="button" disabled><span aria-hidden="true">●</span> Ambil foto</button>
+        <label class="button secondary upload-button" for="photoInput">Pilih foto</label>
+        <input id="photoInput" type="file" accept="image/*" hidden>
+      </div>
+      <p id="message" class="message" role="status" aria-live="polite">Izinkan akses kamera saat diminta oleh browser.</p>
+    </section>
+    <aside class="settings-panel">
+      <div class="settings-heading"><span class="eyebrow">PENGATURAN TIMESTAMP</span><h2>Foto dinas kamu.</h2><p>Atur tanggal dan dinas sebelum mengambil foto.</p></div>
+      <label class="field-label" for="dutyDate">Tanggal foto</label>
+      <input id="dutyDate" type="date" required>
+      <div id="dayLabel" class="day-label"></div>
+      <fieldset class="shift-field"><legend class="field-label">Dinas</legend><div class="shifts">
+        <label class="shift"><input type="radio" name="shift" value="PAGI"><span><b>Pagi</b><small>07.00 – 15.00</small></span></label>
+        <label class="shift"><input type="radio" name="shift" value="SIANG"><span><b>Siang</b><small>15.00 – 22.00</small></span></label>
+        <label class="shift"><input type="radio" name="shift" value="MALAM"><span><b>Malam</b><small>Acak 22.00 – 24.00</small></span></label>
+      </div></fieldset>
+      <div class="time-card"><div><label class="field-label" for="manualTime">Jam pada foto <span id="timeMode" class="fixed-label">Acak</span></label><input id="manualTime" type="time" step="1" required aria-describedby="timeHelp"><span id="effectiveDate" class="effective-date"></span></div><button id="randomize" class="reroll" type="button" title="Acak jam sesuai dinas">↻ <span>Acak jam</span></button></div>
+      <p id="timeHelp" class="note">Klik jam untuk mengedit, atau pilih Acak jam.</p>
+      <p id="nightNote" class="note" hidden>Jam acak malam hanya 22:00:00–23:59:59. Tanggal foto tetap sesuai pilihan.</p>
+      <div class="camera-officer-summary"><span class="eyebrow">PETUGAS</span><strong id="cameraOfficerName">ANDISA JATI APRILIA ABADI</strong><button class="text-button officer-open" type="button">Ganti / simpan petugas</button></div>
+      <div class="identity"><div class="identity-heading"><span class="eyebrow">PETUGAS</span><span class="fixed-label">Bisa diedit</span></div>
+        <label class="field-label" for="savedOfficer">Petugas tersimpan</label><select id="savedOfficer"><option value="">Pilih petugas</option></select>
+        <label class="field-label" for="officerName">Nama</label><input id="officerName" type="text" value="ANDISA JATI APRILIA ABADI" maxlength="70" autocomplete="off" required>
+        <div class="officer-row"><div><label class="field-label" for="officerNipp">NIPP</label><input id="officerNipp" type="text" value="76121" inputmode="numeric" pattern="[0-9]{1,20}" maxlength="20" autocomplete="off" required></div><button id="saveOfficer" class="button secondary" type="button">Simpan Petugas</button></div>
+        <p id="officerMessage" class="note" role="status" aria-live="polite">Petugas disimpan di browser perangkat ini.</p>
+        <dl><dt>Jabatan</dt><dd>PLR</dd><dt>UPT</dt><dd>STASIUN JAKARTAKOTA</dd><dt>Alamat</dt><dd>Pinangsia, Kecamatan Taman Sari, Kota Jakarta</dd><dt>Lokasi</dt><dd id="locationValue">-6.1376467, 106.81578</dd></dl>
+        <div class="location-actions"><span class="note">Koordinat manual · variasi digit terakhir</span><button id="randomizeLocation" class="text-button" type="button">Acak koordinat</button></div>
+      </div>
+      <button id="download" class="button download" type="button" disabled>Unduh foto JPG <span aria-hidden="true">↓</span></button>
+      <p id="singleDimensions" class="download-note">1200 × 1600 px · Rasio 3:4</p><p id="singleSaveStatus" class="single-save-status">Foto disimpan otomatis setelah diunggah.</p>
+    </aside>
+  </main>
+  <dialog id="dutyEditorDialog" class="duty-editor-dialog">
+    <form id="dutyEditorForm">
+      <div class="dialog-heading"><div><span class="eyebrow">DINAS PADA TANGGAL INI</span><h2 id="dutyEditorTitle"></h2></div><button id="closeDutyEditor" class="button secondary" type="button">Tutup</button></div>
+      <p id="dutyEditorBase" class="duty-editor-base"></p>
+      <div class="duty-editor-main"><label>Dinas utama<select id="dutyEditorMainShift"><option value="AUTO">Sesuai pola otomatis</option><option value="PAGI">PAGI</option><option value="SIANG">SIANG</option><option value="MALAM">MALAM</option><option value="LIBUR">LIBUR</option></select></label><label>IJK khusus (WIB)<input id="dutyEditorMainTime" type="time"></label></div>
+      <p class="note">IJK boleh kosong untuk memakai jam dinas umum. Pengingat tetap 3 jam sebelum IJK. Mengubah satu tanggal tidak menggeser pola tanggal lain.</p>
+      <label class="field-label" for="dutyEditorNote">Catatan<input id="dutyEditorNote" type="text" maxlength="200" placeholder="Contoh: bertukar dinas dengan rekan"></label>
+      <div class="duty-extra-heading"><h3>Dinas tambahan / menutupi rekan</h3><button id="addExtraDuty" class="button secondary" type="button">+ Tambah dinas</button></div>
+      <div id="dutyEditorExtras"></div>
+      <p class="note">Dinas tambahan tetap tampil bersama jadwal utamamu, termasuk saat jadwal utama LIBUR.</p>
+      <p id="dutyEditorMessage" class="message" role="status" aria-live="polite"></p>
+      <div class="duty-editor-actions"><button id="resetDutyDate" class="text-button" type="button">Kembalikan tanggal ini ke pola</button><button id="openDutyPhoto" class="button secondary" type="button">Lihat foto tanggal ini</button><button class="button primary" type="submit">Simpan dinas</button></div>
+    </form>
+  </dialog>
+  <dialog id="officerDialog" class="editor-dialog"><div class="dialog-heading"><h2>Petugas</h2><button id="closeOfficer" class="button secondary" type="button">Tutup</button></div><div id="officerDialogContent"></div></dialog>
+  <dialog id="photoDialog" class="photo-dialog"><div class="dialog-heading"><div><span class="eyebrow">PRATINJAU HASIL</span><h2 id="previewDate"></h2></div><button id="closePreview" class="button secondary" type="button">Tutup</button></div><div class="preview-layout"><canvas id="monthPreviewCanvas" width="1200" height="1600" aria-label="Pratinjau foto bulanan"></canvas><div class="preview-settings"><p id="previewFilename" class="note"></p><label class="field-label" for="previewMoveDate">Tanggal foto</label><select id="previewMoveDate"></select><p class="note">Jika tanggal tujuan sudah terisi, kedua isi tanggal ditukar.</p><label class="field-label" for="previewShift">Dinas</label><select id="previewShift"><option value="AUTO">OTOMATIS SESUAI TANGGAL</option><option value="PAGI">PAGI</option><option value="SIANG">SIANG</option><option value="MALAM">MALAM</option><option value="LIBUR">LIBUR</option></select><label class="field-label" for="previewTime">Jam</label><input id="previewTime" type="time" step="1" required><button id="previewRandom" class="button secondary" type="button">Acak jam</button><label class="check-label"><input id="previewOldStamp" type="checkbox"> Tutup timestamp lama</label><label class="field-label" for="previewCover">Tinggi penutup: <span id="coverValue">20%</span></label><input id="previewCover" type="range" min="19" max="45" value="20"><p class="note">Penutup menggantikan bagian bawah foto dengan bidang gelap. Periksa agar tulisan lama tertutup sepenuhnya.</p><label class="check-label"><input id="previewLogo" type="checkbox" checked> Tambahkan logo KAI</label><p id="previewLocation" class="note"></p><button id="previewDownload" class="button download" type="button">Unduh foto ini ↓</button><p id="previewMessage" class="message" role="status"></p></div></div></dialog>
+  <dialog id="dayCameraDialog" class="day-camera-dialog">
+    <div class="dialog-heading"><div><span class="eyebrow">KAMERA LANGSUNG</span><h2 id="dayCameraDate"></h2></div><button id="closeDayCamera" class="button secondary" type="button">Tutup</button></div>
+    <div id="dayCameraStage" class="day-camera-stage"><video id="dayCameraVideo" playsinline muted autoplay hidden></video><canvas id="dayCameraCanvas" width="1200" height="1600" aria-label="Pratinjau kamera untuk tanggal yang dipilih"></canvas><div id="dayCameraEmpty" class="camera-wait">Membuka kamera…</div></div>
+    <div class="camera-zoom-controls"><div class="zoom-heading"><label for="dayCameraZoom">Perbesar foto</label><output id="dayCameraZoomValue" for="dayCameraZoom">100%</output></div><div class="zoom-slider-row"><input id="dayCameraZoom" type="range" min="100" max="200" step="5" value="100" aria-valuetext="100 persen" disabled><button id="resetDayCameraZoom" class="text-button" type="button" disabled>Reset 100%</button></div></div>
+    <div class="day-camera-controls"><button id="switchDayCamera" class="button secondary" type="button" disabled>Ganti kamera</button><button id="captureDayCamera" class="button primary" type="button" disabled>Ambil &amp; simpan foto</button></div>
+    <p id="dayCameraMessage" class="message" role="status" aria-live="polite"></p><button id="retryDayCamera" class="text-button" type="button" hidden>Coba kamera lagi</button>
+  </dialog>
+  <footer>Dinesan Andisa <span>•</span> Jadwal &amp; foto tersimpan di perangkatmu.</footer>
+</body>
+</html>
