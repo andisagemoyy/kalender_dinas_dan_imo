@@ -14,15 +14,15 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-kai-32.png">
   <link rel="icon" type="image/svg+xml" href="icons/favicon-kai.svg">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-kai.png">
-  <link rel="stylesheet" href="style.css?v=20261006-kaiicons">
-  <script src="app.js?v=20261006-kaiicons" defer></script>
+  <link rel="stylesheet" href="style.css?v=20261007-officerposition">
+  <script src="app.js?v=20261007-officerposition" defer></script>
   <script src="leave.js" defer></script>
   <script src="zip.js" defer></script>
-  <script src="duty-schedule.js?v=20261006-kaiicons" defer></script>
-  <script src="duty-planner.js?v=20261006-kaiicons" defer></script>
-  <script src="monthly.js?v=20261006-kaiicons" defer></script>
-  <script src="daily-camera.js?v=20261006-kaiicons" defer></script>
-  <script src="duty-reminders.js?v=20261006-kaiicons" defer></script>
+  <script src="duty-schedule.js?v=20261007-officerposition" defer></script>
+  <script src="duty-planner.js?v=20261007-officerposition" defer></script>
+  <script src="monthly.js?v=20261007-officerposition" defer></script>
+  <script src="daily-camera.js?v=20261007-officerposition" defer></script>
+  <script src="duty-reminders.js?v=20261007-officerposition" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -91,13 +91,14 @@
       <div class="time-card"><div><label class="field-label" for="manualTime">Jam pada foto <span id="timeMode" class="fixed-label">Acak</span></label><input id="manualTime" type="time" step="1" required aria-describedby="timeHelp"><span id="effectiveDate" class="effective-date"></span></div><button id="randomize" class="reroll" type="button" title="Acak jam sesuai dinas">↻ <span>Acak jam</span></button></div>
       <p id="timeHelp" class="note">Klik jam untuk mengedit, atau pilih Acak jam.</p>
       <p id="nightNote" class="note" hidden>Jam acak malam hanya 22:00:00–23:59:59. Tanggal foto tetap sesuai pilihan.</p>
-      <div class="camera-officer-summary"><span class="eyebrow">PETUGAS</span><strong id="cameraOfficerName">ANDISA JATI APRILIA ABADI</strong><button class="text-button officer-open" type="button">Ganti / simpan petugas</button></div>
+      <div class="camera-officer-summary"><span class="eyebrow">PETUGAS</span><strong id="cameraOfficerName">ANDISA JATI APRILIA ABADI</strong><span id="cameraOfficerPosition">PLR</span><button class="text-button officer-open" type="button">Ganti / simpan petugas</button></div>
       <div class="identity"><div class="identity-heading"><span class="eyebrow">PETUGAS</span><span class="fixed-label">Bisa diedit</span></div>
         <label class="field-label" for="savedOfficer">Petugas tersimpan</label><select id="savedOfficer"><option value="">Pilih petugas</option></select>
         <label class="field-label" for="officerName">Nama</label><input id="officerName" type="text" value="ANDISA JATI APRILIA ABADI" maxlength="70" autocomplete="off" required>
+        <label class="field-label" for="officerPosition">Jabatan</label><input id="officerPosition" type="text" value="PLR" maxlength="40" autocomplete="off" placeholder="Contoh: PLR, PAP, PPKA" required>
         <div class="officer-row"><div><label class="field-label" for="officerNipp">NIPP</label><input id="officerNipp" type="text" value="76121" inputmode="numeric" pattern="[0-9]{1,20}" maxlength="20" autocomplete="off" required></div><button id="saveOfficer" class="button secondary" type="button">Simpan Petugas</button></div>
         <p id="officerMessage" class="note" role="status" aria-live="polite">Petugas disimpan di browser perangkat ini.</p>
-        <dl><dt>Jabatan</dt><dd>PLR</dd><dt>UPT</dt><dd>STASIUN JAKARTAKOTA</dd><dt>Alamat</dt><dd>Pinangsia, Kecamatan Taman Sari, Kota Jakarta</dd><dt>Lokasi</dt><dd id="locationValue">-6.1376467, 106.81578</dd></dl>
+        <dl><dt>UPT</dt><dd>STASIUN JAKARTAKOTA</dd><dt>Alamat</dt><dd>Pinangsia, Kecamatan Taman Sari, Kota Jakarta</dd><dt>Lokasi</dt><dd id="locationValue">-6.1376467, 106.81578</dd></dl>
         <div class="location-actions"><span class="note">Koordinat manual · variasi digit terakhir</span><button id="randomizeLocation" class="text-button" type="button">Acak koordinat</button></div>
       </div>
       <button id="download" class="button download" type="button" disabled>Unduh foto JPG <span aria-hidden="true">↓</span></button>

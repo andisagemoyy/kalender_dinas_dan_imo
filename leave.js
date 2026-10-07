@@ -19,7 +19,7 @@ function paintLeaveCard(context, date, identity) {
   context.textBaseline = 'top'; context.fillStyle = '#fff';
   const lines = [
     `NAMA: ${identity.name} | NIPP: ${identity.nipp}`,
-    `JABATAN: ${PROFILE.position}`,
+    `JABATAN: ${identity.position || PROFILE.position}`,
     `UPT: ${PROFILE.unit}`,
     'KETERANGAN: LIBUR',
     `WAKTU: ${dateText(date).replace(/, 0(\d) /, ', $1 ')} ${LEAVE_TIME}`

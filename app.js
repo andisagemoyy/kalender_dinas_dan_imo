@@ -29,17 +29,24 @@ let timestamp = null;
 let lastFrame = 0;
 let currentBlobUrl = null;
 let timeMode = 'random';
-let officer = { name: PROFILE.name, nipp: PROFILE.nipp };
+let officer = { name: PROFILE.name, nipp: PROFILE.nipp, position: PROFILE.position };
 let savedOfficers = [];
 let manualLocation = PROFILE.location;
 const OFFICER_STORAGE_KEY = 'imocam.petugas.v1';
 
 function validOfficer(value) {
-  return value && typeof value.name === 'string' && typeof value.nipp === 'string' && value.name.trim().length > 0 && value.name.length <= 70 && /^\d{1,20}$/.test(value.nipp);
+  return value && typeof value.name === 'string' && typeof value.nipp === 'string' && typeof value.position === 'string' && value.name.trim().length > 0 && value.name.length <= 70 && /^\d{1,20}$/.test(value.nipp) && value.position.trim().length > 0 && value.position.length <= 40;
+}
+function normalizeOfficer(value, fallbackPosition = PROFILE.position) {
+  if (!value || typeof value.name !== 'string' || typeof value.nipp !== 'string') return null;
+  const position = value.position === undefined ? fallbackPosition : value.position;
+  if (typeof position !== 'string') return null;
+  const normalized = { name: value.name.trim().toUpperCase(), nipp: value.nipp.trim(), position: position.trim().toUpperCase() };
+  return validOfficer(normalized) ? normalized : null;
 }
 function readOfficerFields() {
-  officer = { name: $('officerName').value.trim().toUpperCase(), nipp: $('officerNipp').value.trim() };
-  $('savedOfficer').value = savedOfficers.some(p => p.nipp === officer.nipp && p.name === officer.name) ? officer.nipp : '';
+  officer = { name: $('officerName').value.trim().toUpperCase(), nipp: $('officerNipp').value.trim(), position: $('officerPosition').value.trim().toUpperCase() };
+  $('savedOfficer').value = savedOfficers.some(p => p.nipp === officer.nipp && p.name === officer.name && p.position === officer.position) ? officer.nipp : '';
   updateButtons();
   render();
 }
@@ -50,18 +57,18 @@ function rebuildOfficerMenu() {
   prompt.value = ''; prompt.textContent = 'Pilih petugas'; menu.append(prompt);
   savedOfficers.forEach(p => {
     const option = document.createElement('option');
-    option.value = p.nipp; option.textContent = `${p.name} · ${p.nipp}`;
+    option.value = p.nipp; option.textContent = `${p.name} · ${p.nipp} · ${p.position}`;
     menu.append(option);
   });
-  menu.value = savedOfficers.some(p => p.nipp === officer.nipp && p.name === officer.name) ? officer.nipp : '';
+  menu.value = savedOfficers.some(p => p.nipp === officer.nipp && p.name === officer.name && p.position === officer.position) ? officer.nipp : '';
 }
 function loadOfficers() {
-  savedOfficers = [{ name: PROFILE.name, nipp: PROFILE.nipp }];
+  savedOfficers = [{ name: PROFILE.name, nipp: PROFILE.nipp, position: PROFILE.position }];
   try {
     const data = JSON.parse(localStorage.getItem(OFFICER_STORAGE_KEY));
     if (data && Array.isArray(data.officers)) {
       const unique = new Map(savedOfficers.map(p => [p.nipp, p]));
-      data.officers.filter(validOfficer).slice(0, 100).forEach(p => unique.set(p.nipp, { name: p.name.trim().toUpperCase(), nipp: p.nipp }));
+      data.officers.map(value => normalizeOfficer(value)).filter(validOfficer).slice(0, 100).forEach(p => unique.set(p.nipp, p));
       savedOfficers = [...unique.values()];
       const active = savedOfficers.find(p => p.nipp === data.activeNipp);
       if (active) officer = { ...active };
@@ -69,6 +76,7 @@ function loadOfficers() {
   } catch { /* Storage may be blocked; the default officer remains available. */ }
   $('officerName').value = officer.name;
   $('officerNipp').value = officer.nipp;
+  $('officerPosition').value = officer.position;
   rebuildOfficerMenu();
 }
 function persistOfficers() {
@@ -80,7 +88,7 @@ function persistOfficers() {
 function saveOfficer() {
   readOfficerFields();
   if (!validOfficer(officer)) {
-    $('officerMessage').textContent = 'Isi nama dan NIPP berupa angka sebelum menyimpan.';
+    $('officerMessage').textContent = 'Isi nama, jabatan, dan NIPP berupa angka sebelum menyimpan.';
     return;
   }
   const index = savedOfficers.findIndex(p => p.nipp === officer.nipp);
@@ -89,6 +97,7 @@ function saveOfficer() {
   const saved = persistOfficers();
   rebuildOfficerMenu();
   $('officerName').value = officer.name;
+  $('officerPosition').value = officer.position;
   $('officerMessage').textContent = saved ? 'Petugas tersimpan. Pilih kembali melalui menu di atas.' : 'Petugas bisa dipakai saat ini, tetapi penyimpanan browser diblokir.';
 }
 function selectOfficer() {
@@ -97,6 +106,7 @@ function selectOfficer() {
   officer = { ...selected };
   $('officerName').value = officer.name;
   $('officerNipp').value = officer.nipp;
+  $('officerPosition').value = officer.position;
   const saved = persistOfficers();
   $('officerMessage').textContent = saved ? 'Petugas dipilih.' : 'Petugas dipilih untuk sesi ini. Penyimpanan browser diblokir.';
   updateButtons(); render();
@@ -160,7 +170,7 @@ function dateText(date) { return `${DAYS[date.getUTCDay()]}, ${pad(date.getUTCDa
 function overlayLines(date, shift, identity = officer, location = manualLocation) {
   return [
     `NAMA: ${identity.name} | NIPP: ${identity.nipp}`,
-    `JABATAN: ${PROFILE.position} | DINAS: ${shift}`,
+    `JABATAN: ${identity.position || PROFILE.position} | DINAS: ${shift}`,
     `UPT: ${PROFILE.unit}`,
     `ALAMAT: ${PROFILE.address}`,
     `LOKASI: ${location}`,
@@ -442,6 +452,7 @@ document.querySelectorAll('input[name="shift"]').forEach(input => input.addEvent
 $('manualTime').addEventListener('input', () => { timeMode = 'manual'; refreshTimestamp(false); });
 $('officerName').addEventListener('input', readOfficerFields);
 $('officerNipp').addEventListener('input', readOfficerFields);
+$('officerPosition').addEventListener('input', readOfficerFields);
 $('saveOfficer').addEventListener('click', saveOfficer);
 $('savedOfficer').addEventListener('change', selectOfficer);
 $('randomizeLocation').addEventListener('click', randomizeCoordinates);

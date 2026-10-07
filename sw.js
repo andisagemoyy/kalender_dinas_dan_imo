@@ -1,10 +1,10 @@
 'use strict';
-const CACHE_NAME = 'dinesan-andisa-shell-20261006-v2-kai';
+const CACHE_NAME = 'dinesan-andisa-shell-20261007-v3-officerposition';
 const SHELL_FILES = [
-  './', './index.html', './style.css?v=20261006-kaiicons', './app.js?v=20261006-kaiicons',
-  './duty-schedule.js?v=20261006-kaiicons', './duty-planner.js?v=20261006-kaiicons',
-  './duty-reminders.js?v=20261006-kaiicons', './monthly.js?v=20261006-kaiicons',
-  './daily-camera.js?v=20261006-kaiicons', './leave.js', './zip.js',
+  './', './index.html', './style.css?v=20261007-officerposition', './app.js?v=20261007-officerposition',
+  './duty-schedule.js?v=20261007-officerposition', './duty-planner.js?v=20261007-officerposition',
+  './duty-reminders.js?v=20261007-officerposition', './monthly.js?v=20261007-officerposition',
+  './daily-camera.js?v=20261007-officerposition', './leave.js', './zip.js',
   './manifest.webmanifest', './manifest.webmanifest?v=20261006-kai', './favicon.ico', './favicon.ico?v=20261006-kai', './apple-touch-icon.png',
   './icons/favicon-kai.svg', './icons/favicon-kai-16.png', './icons/favicon-kai-32.png', './icons/favicon-kai-48.png',
   './icons/apple-touch-icon-kai.png', './icons/kai-icon-192.png', './icons/kai-icon-512.png', './icons/kai-maskable-512.png',

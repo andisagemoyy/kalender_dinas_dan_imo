@@ -91,8 +91,9 @@ async function flushMonthSaves() {
 }
 function syncMonthOfficer() {
   $('monthlyOfficerName').textContent = officer.name || 'Isi nama petugas';
-  $('monthlyOfficerNipp').textContent = `NIPP ${officer.nipp || '—'}`;
+  $('monthlyOfficerNipp').textContent = `NIPP ${officer.nipp || '—'} · ${officer.position || 'Isi jabatan'}`;
   $('cameraOfficerName').textContent = officer.name || 'Isi nama petugas';
+  $('cameraOfficerPosition').textContent = officer.position || 'Isi jabatan';
   updateMonthSummary();
   if (monthState.previewRecord && monthState.previewImage) renderMonthPreview();
 }
@@ -370,8 +371,8 @@ async function downloadPreviewPhoto() {
 }
 function monthCsv(records, identity) {
   const cell = value => { let text = String(value ?? ''); if (/^[=+\-@]/.test(text)) text = "'" + text; return `"${text.replaceAll('"', '""')}"`; };
-  const rows = [['Tanggal', 'Hari', 'Jadwal otomatis', 'Dinas', 'Jam manual', 'Nama', 'NIPP', 'Koordinat manual', 'File asli', 'Hasil JPG']];
-  records.forEach(record => rows.push([record.date, DAYS[parseDate(record.date).getUTCDay()], dutyDayPlan(record.date).main.label, record.shift, record.time, identity.name, identity.nipp, record.shift === 'LIBUR' ? '' : record.location, record.shift === 'LIBUR' ? 'Kartu LIBUR' : record.filename, monthPhotoName(record, identity)]));
+  const rows = [['Tanggal', 'Hari', 'Jadwal otomatis', 'Dinas', 'Jam manual', 'Nama', 'NIPP', 'Jabatan', 'Koordinat manual', 'File asli', 'Hasil JPG']];
+  records.forEach(record => rows.push([record.date, DAYS[parseDate(record.date).getUTCDay()], dutyDayPlan(record.date).main.label, record.shift, record.time, identity.name, identity.nipp, identity.position || PROFILE.position, record.shift === 'LIBUR' ? '' : record.location, record.shift === 'LIBUR' ? 'Kartu LIBUR' : record.filename, monthPhotoName(record, identity)]));
   return '\ufeff' + rows.map(row => row.map(cell).join(',')).join('\r\n');
 }
 async function exportMonthPhotos() {
@@ -475,7 +476,7 @@ function changeDutyMonth(direction) {
 $('officerDialogContent').append(document.querySelector('.identity'));
 document.querySelectorAll('.officer-open').forEach(button => button.addEventListener('click', () => $('officerDialog').showModal()));
 $('closeOfficer').addEventListener('click', () => $('officerDialog').close());
-['officerName', 'officerNipp'].forEach(id => $(id).addEventListener('input', syncMonthOfficer));
+['officerName', 'officerNipp', 'officerPosition'].forEach(id => $(id).addEventListener('input', syncMonthOfficer));
 $('savedOfficer').addEventListener('change', syncMonthOfficer); $('saveOfficer').addEventListener('click', syncMonthOfficer);
 $('monthlyTab').addEventListener('click', () => chooseMode('monthly')); $('cameraTab').addEventListener('click', () => chooseMode('camera'));
 $('monthPicker').value = jakartaToday().slice(0, 7); $('monthPicker').min = '1900-01'; $('monthPicker').max = '9999-12';

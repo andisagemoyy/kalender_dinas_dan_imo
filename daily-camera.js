@@ -74,7 +74,7 @@ async function startDayCamera() {
 }
 async function openDayCamera(record) {
   if (!record || record.shift === 'LIBUR' || monthState.loading || monthState.importing || monthState.exporting || dayCamera.saving) return;
-  if (!manualTimestamp(record.date, record.time) || !validOfficer(officer)) { monthNotice('Isi nama, NIPP, dan jam yang valid sebelum mengambil foto.', true); return; }
+  if (!manualTimestamp(record.date, record.time) || !validOfficer(officer)) { monthNotice('Isi nama, jabatan, NIPP, dan jam yang valid sebelum mengambil foto.', true); return; }
   if (cameraReady || openingCamera) { stopCamera(); setStatus('Kamera belum aktif'); if (!photo) $('emptyState').hidden = false; }
   stopDayCameraTracks(); dayCamera.record = record;
   $('dayCameraDate').textContent = `${dateText(parseDate(record.date))} · ${record.shift}`;
@@ -142,7 +142,9 @@ async function restoreSingleDraft() {
     timeMode = record.timeMode === 'manual' ? 'manual' : 'random';
     timeOffset = Number.isInteger(record.timeOffset) && record.timeOffset >= 0 && record.timeOffset < SHIFT_WINDOWS[selectedShift][1] ? record.timeOffset : 0;
     $('manualTime').value = manualTimestamp(dateInput.value, record.time) ? record.time : monthRandomTime(dateInput.value, selectedShift);
-    if (validOfficer(record.officer)) { officer = { ...record.officer }; $('officerName').value = officer.name; $('officerNipp').value = officer.nipp; rebuildOfficerMenu(); }
+    const storedPosition = savedOfficers.find(person => person.nipp === record.officer?.nipp)?.position || PROFILE.position;
+    const restoredOfficer = normalizeOfficer(record.officer, storedPosition);
+    if (restoredOfficer) { officer = restoredOfficer; $('officerName').value = officer.name; $('officerNipp').value = officer.nipp; $('officerPosition').value = officer.position; rebuildOfficerMenu(); }
     manualLocation = typeof record.location === 'string' ? record.location : PROFILE.location; $('locationValue').textContent = manualLocation;
     document.querySelector(`input[name="shift"][value="${selectedShift}"]`).checked = true;
     $('emptyState').hidden = true; $('capture').textContent = 'Ambil ulang';
@@ -157,7 +159,7 @@ $('dayCameraZoom').addEventListener('input', event => setDayCameraZoom(event.tar
 $('resetDayCameraZoom').addEventListener('click', () => setDayCameraZoom(100));
 $('closeDayCamera').addEventListener('click', () => $('dayCameraDialog').close());
 $('dayCameraDialog').addEventListener('close', () => { stopDayCameraTracks(); dayCamera.record = null; });
-['dutyDate', 'manualTime', 'officerName', 'officerNipp'].forEach(id => $(id).addEventListener('input', () => saveSingleDraft()));
+['dutyDate', 'manualTime', 'officerName', 'officerNipp', 'officerPosition'].forEach(id => $(id).addEventListener('input', () => saveSingleDraft()));
 document.querySelectorAll('input[name="shift"]').forEach(input => input.addEventListener('change', () => saveSingleDraft()));
 ['randomize', 'randomizeLocation', 'savedOfficer', 'saveOfficer'].forEach(id => $(id).addEventListener(id === 'savedOfficer' ? 'change' : 'click', () => saveSingleDraft()));
 window.addEventListener('pagehide', stopDayCameraTracks);
